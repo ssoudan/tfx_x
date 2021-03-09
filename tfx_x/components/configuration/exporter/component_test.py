@@ -16,11 +16,11 @@
 import os
 
 import tensorflow as tf
-from tfx.dsl.io import fileio
-from tfx.types import channel_utils, artifact_utils
+from tfx.types import channel_utils
 
-from tfx_x.components.configuration.exporter import component, executor
 from tfx_x.components.configuration import artifacts
+from tfx_x.components.configuration.exporter import component
+from tfx_x.components.configuration.exporter.executor import PIPELINE_CONFIGURATION_KEY
 
 
 class ExportTest(tf.test.TestCase):
@@ -46,9 +46,10 @@ class ExportTest(tf.test.TestCase):
                                         pipeline_configuration=channel_utils.as_channel([pipeline_configuration]),
                                         instance_name=u'Testing123')
     self.assertEqual(artifacts.PipelineConfiguration.TYPE_NAME,
-                     this_component.outputs['pipeline_configuration'].type_name)
-    artifact_collection = this_component.outputs['pipeline_configuration'].get()
+                     this_component.outputs[PIPELINE_CONFIGURATION_KEY].type_name)
+    artifact_collection = this_component.outputs[PIPELINE_CONFIGURATION_KEY].get()
     self.assertIsNotNone(artifact_collection)
+
 
 if __name__ == '__main__':
   tf.test.main()

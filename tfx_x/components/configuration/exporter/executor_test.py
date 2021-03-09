@@ -22,7 +22,7 @@ from tfx.utils import json_utils
 
 from tfx_x.components.configuration import artifacts
 from tfx_x.components.configuration.exporter import component, executor
-from tfx_x.components.configuration.exporter.executor import CUSTOM_CONFIG_KEY, PIPELINE_CONFIG_KEY
+from tfx_x.components.configuration.exporter.executor import CUSTOM_CONFIG_KEY, PIPELINE_CONFIGURATION_KEY
 
 
 class ExecutorTest(tf.test.TestCase):
@@ -48,8 +48,8 @@ class ExecutorTest(tf.test.TestCase):
                                         pipeline_configuration=channel_utils.as_channel([pipeline_configuration]),
                                         instance_name=u'Testing123')
     self.assertEqual(artifacts.PipelineConfiguration.TYPE_NAME,
-                     this_component.outputs['pipeline_configuration'].type_name)
-    artifact_collection = this_component.outputs['pipeline_configuration'].get()
+                     this_component.outputs[PIPELINE_CONFIGURATION_KEY].type_name)
+    artifact_collection = this_component.outputs[PIPELINE_CONFIGURATION_KEY].get()
     self.assertIsNotNone(artifact_collection)
 
     self._input_dict = {
@@ -61,7 +61,7 @@ class ExecutorTest(tf.test.TestCase):
     }
 
     self._output_dict = {
-      PIPELINE_CONFIG_KEY: [pipeline_configuration],
+      PIPELINE_CONFIGURATION_KEY: [pipeline_configuration],
     }
 
     # Run executor.

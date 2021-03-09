@@ -28,7 +28,7 @@ import tensorflow as tf
 import shap
 
 CUSTOM_CONFIG_KEY = 'custom_config'
-PIPELINE_CONFIG_KEY = 'pipeline_configuration'
+PIPELINE_CONFIGURATION_KEY = 'pipeline_configuration'
 
 
 class Executor(base_executor.BaseExecutor):
@@ -58,7 +58,7 @@ class Executor(base_executor.BaseExecutor):
     """
     self._log_startup(input_dict, output_dict, exec_properties)
 
-    pipeline_configuration = artifact_utils.get_single_instance(output_dict[PIPELINE_CONFIG_KEY])
+    pipeline_configuration = artifact_utils.get_single_instance(output_dict[PIPELINE_CONFIGURATION_KEY])
     custom_config = exec_properties.get(CUSTOM_CONFIG_KEY, "{}")
 
     output_dir = artifact_utils.get_single_uri([pipeline_configuration])

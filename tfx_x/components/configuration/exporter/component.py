@@ -28,6 +28,7 @@ from tfx.utils import json_utils
 
 from tfx_x.components.configuration import artifacts
 from tfx_x.components.configuration.exporter import executor
+from tfx_x.components.configuration.exporter.executor import CUSTOM_CONFIG_KEY, PIPELINE_CONFIGURATION_KEY
 
 
 class ExporterSpec(types.ComponentSpec):
@@ -36,13 +37,13 @@ class ExporterSpec(types.ComponentSpec):
   PARAMETERS = {
     # These are parameters that will be passed in the call to
     # create an instance of this component.
-    'custom_config': ExecutionParameter(type=(str, Text)),
+    CUSTOM_CONFIG_KEY: ExecutionParameter(type=(str, Text), optional=True),
   }
   INPUTS = {
   }
   OUTPUTS = {
     # This will be a dictionary which this component will populate
-    'pipeline_configuration': ChannelParameter(type=artifacts.PipelineConfiguration),
+    PIPELINE_CONFIGURATION_KEY: ChannelParameter(type=artifacts.PipelineConfiguration),
   }
 
 

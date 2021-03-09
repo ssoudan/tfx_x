@@ -1,7 +1,7 @@
 # Configuration
 
 ## Description
-These component export - and later will - transform and import configuration. We want to treat the pipeline 
+These components export - and later will - transform and import configuration. We want to treat the pipeline 
 configuration as an artifact.
 
 That way we can store the custom_config standard components use, but we can also create our own components that get 
