@@ -13,6 +13,8 @@ their configuration from an artifact.
 
 ## Usage
 
+See [README](./example/README.md) for a complete example.
+
     ...
     config_exporter = Exporter(custom_config=custom_config) 
     ...
