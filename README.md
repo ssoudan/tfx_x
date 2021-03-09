@@ -8,5 +8,6 @@ See LICENSE file.
 ## Collection of custom components for TFX
 
 Around:
-- [configuration](./tfx_x/components/configuration/README.md) 
+- [configuration](./tfx_x/components/configuration/README.md)
+- [examples](./tfx_x/components/examples/README.md)
 - ...
