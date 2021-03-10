@@ -11,3 +11,9 @@ Around:
 - [configuration](./tfx_x/components/configuration/README.md)
 - [examples](./tfx_x/components/examples/README.md)
 - ...
+
+## Installation
+
+Until packages are published:
+
+    pip install --force-reinstall git+https://github.com/ssoudan/tfx_x

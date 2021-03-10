@@ -12,27 +12,22 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""Executor for pipeline configuration exporter"""
+"""Executor for pipeline configuration converter"""
 
-import json
 import os
 from typing import Any, Dict, List, Text
 
 from tfx import types
 from tfx.dsl.components.base import base_executor
-from tfx.dsl.io import fileio
 from tfx.types import artifact_utils
 from tfx.utils import io_utils
-
-import tensorflow as tf
-import shap
 
 CUSTOM_CONFIG_KEY = 'custom_config'
 PIPELINE_CONFIGURATION_KEY = 'pipeline_configuration'
 
 
 class Executor(base_executor.BaseExecutor):
-  """Executor for Exporter."""
+  """Executor for FromCustomConfig."""
 
   def Do(self,
          input_dict: Dict[Text, List[types.Artifact]],
@@ -46,7 +41,7 @@ class Executor(base_executor.BaseExecutor):
         - pipeline_configuration: A list of type `artifacts.PipelineConfiguration`
       exec_properties: A dict of execution properties, including:
         - custom_config: the configuration to save.
-        - instance_name: Optional unique name. Necessary iff multiple Exporter components
+        - instance_name: Optional unique name. Necessary iff multiple FromCustomConfig components
           are declared in the same pipeline.
 
     Returns:

@@ -12,7 +12,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-
+import json
 import os
 
 import tensorflow as tf
@@ -22,8 +22,8 @@ from tfx.types import artifact_utils
 from tfx.types import standard_artifacts
 
 from tfx_x.components.examples.stratified_sampler import executor
-from tfx_x.components.examples.stratified_sampler.executor import SAMPLING_RESULT_KEY, EXAMPLES_KEY, COUNT_PER_KEY_KEY, \
-  KEY_KEY, SPLITS_TO_TRANSFORM_KEY, SPLITS_TO_COPY_KEY, THRESHOLD_KEY
+from tfx_x.components.examples.stratified_sampler.executor import STRATIFIED_EXAMPLES_KEY, EXAMPLES_KEY, \
+  SAMPLES_PER_KEY_KEY, TO_KEY_FN_KEY, SPLITS_TO_TRANSFORM_KEY, SPLITS_TO_COPY_KEY
 
 
 class ExecutorTest(tf.test.TestCase):
@@ -54,17 +54,19 @@ class ExecutorTest(tf.test.TestCase):
     self._sampling_result.uri = self._stratified_examples_dir
 
     self._output_dict_sr = {
-      SAMPLING_RESULT_KEY: [self._sampling_result],
+      STRATIFIED_EXAMPLES_KEY: [self._sampling_result],
     }
 
     # Create exe properties.
     self._exec_properties = {
       'component_id': self.component_id,
-      SPLITS_TO_TRANSFORM_KEY: ['eval'],
-      SPLITS_TO_COPY_KEY: [],
-      KEY_KEY: 'trip_miles',
-      THRESHOLD_KEY: 42.,
-      COUNT_PER_KEY_KEY: 1000,
+      SPLITS_TO_TRANSFORM_KEY: json.dumps(['eval']),
+      SPLITS_TO_COPY_KEY: json.dumps([]),
+      TO_KEY_FN_KEY: """
+def to_key(m):  
+  return m.features.feature['trip_miles'].float_list.value[0] > 42.
+""",
+      SAMPLES_PER_KEY_KEY: 1000,
     }
 
     # Create context
@@ -96,7 +98,6 @@ class ExecutorTest(tf.test.TestCase):
       dir_path,
       executor._STRATIFIED_EXAMPLES_FILE_PREFIX, tf.train.Example)
     self.assertTrue(results)
-    self.assertIn(self._exec_properties[KEY_KEY], results[0].features.feature)
 
   def _verify_copied_example_split(self, split_name):
     dir_path = os.path.join(self._stratified_examples_dir, split_name)
@@ -106,7 +107,7 @@ class ExecutorTest(tf.test.TestCase):
       fileio.exists(dir_path))
 
   def testDoWithOutputExamplesEvalSplit(self):
-    self._exec_properties['splits_to_transform'] = ['eval']
+    self._exec_properties['splits_to_transform'] = json.dumps(['eval'])
 
     # Run executor.
     stratified_sampler = executor.Executor(self._context)
@@ -122,7 +123,7 @@ class ExecutorTest(tf.test.TestCase):
     self._verify_stratified_example_split('eval')
 
   def testDoWithOutputExamplesAllSplits(self):
-    self._exec_properties[SPLITS_TO_TRANSFORM_KEY] = ['eval', 'train']
+    self._exec_properties[SPLITS_TO_TRANSFORM_KEY] = json.dumps(['eval', 'train'])
 
     # Run executor.
     stratified_sampler = executor.Executor(self._context)
@@ -138,8 +139,8 @@ class ExecutorTest(tf.test.TestCase):
     self._verify_stratified_example_split('eval')
 
   def testDoWithOutputExamplesOneSplitSampledOneSplitCopied(self):
-    self._exec_properties[SPLITS_TO_TRANSFORM_KEY] = ['eval']
-    self._exec_properties[SPLITS_TO_COPY_KEY] = ['train', 'unlabelled']
+    self._exec_properties[SPLITS_TO_TRANSFORM_KEY] = json.dumps(['eval'])
+    self._exec_properties[SPLITS_TO_COPY_KEY] = json.dumps(['train', 'unlabelled'])
 
     # Run executor.
     stratified_sampler = executor.Executor(self._context)

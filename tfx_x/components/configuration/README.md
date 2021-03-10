@@ -1,11 +1,12 @@
 # Configuration
 
 ## Description
-These components export - and later will - transform and import configuration. We want to treat the pipeline 
-configuration as an artifact.
+These components convert, - and later will - export, transform and import configuration. We want to treat the pipeline 
+configuration as an artifact and be able to pass it to our own components while having it stored immutably somewhere.
 
 That way we can store the custom_config standard components use, but we can also create our own components that get 
-their configuration from an artifact.
+their configuration from an artifact. For now we will start with a single artifact `PipelineConfiguration` but might 
+want to create more in the future.
 
 ## Artifact
 
@@ -13,10 +14,10 @@ their configuration from an artifact.
 
 ## Usage
 
-See [README](./example/README.md) for a complete example.
+See [README](../example/README.md) for a complete example.
 
     ...
-    config_exporter = Exporter(custom_config=custom_config) 
+    pipeline_configuration = FromCustomConfig(custom_config=custom_config) 
     ...
     my_custom_component = MySuperCustomComponent(config_exporter.outputs['pipeline_configuration'], ...)
     ...
@@ -24,7 +25,7 @@ See [README](./example/README.md) for a complete example.
         pipeline_name=pipeline_name,
         pipeline_root=pipeline_root,
         components=[
-          config_exporter,
+          pipeline_configuration,
           my_custom_compenent,
           ...
         ],

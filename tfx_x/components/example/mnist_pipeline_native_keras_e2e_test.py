@@ -28,16 +28,15 @@
 """E2E Tests for tfx.examples.mnist.mnist_pipeline_native_keras."""
 
 import os
-from typing import Text
 import unittest
+from typing import Text
 
 import tensorflow as tf
-
 from tfx.dsl.io import fileio
 from tfx.orchestration import metadata
 from tfx.orchestration.beam.beam_dag_runner import BeamDagRunner
 
-from tfx_x.components.configuration.example import mnist_pipeline_native_keras
+from tfx_x.components.example import mnist_pipeline_native_keras
 
 
 @unittest.skipIf(tf.__version__ < '2',
@@ -52,7 +51,14 @@ class MNISTPipelineNativeKerasEndToEndTest(tf.test.TestCase):
 
     self._pipeline_name = 'keras_test'
     self._data_root = os.path.join(os.path.dirname(__file__), '../testdata')
-    self._custom_config = {'layer_count': 3}
+
+    to_key_fn = """
+def to_key(m):
+  return m.features.feature['image_class'].int64_list.value[0]
+"""
+
+    self._custom_config = {'layer_count': 3,
+                           'to_key_fn': to_key_fn}
     self._module_file = os.path.join(
       os.path.dirname(__file__), 'mnist_utils_native_keras.py')
     self._serving_model_dir = os.path.join(self._test_dir, 'serving_model')
@@ -82,11 +88,12 @@ class MNISTPipelineNativeKerasEndToEndTest(tf.test.TestCase):
 
   def assertPipelineExecution(self) -> None:
     self.assertExecutedOnce('ImportExampleGen')
-    self.assertExecutedOnce('Exporter')
+    self.assertExecutedOnce('FromCustomConfig')
     self.assertExecutedOnce('Evaluator.mnist')
     self.assertExecutedOnce('ExampleValidator')
     self.assertExecutedOnce('Pusher.mnist')
     self.assertExecutedOnce('SchemaGen')
+    self.assertExecutedOnce('StratifiedSampler')
     self.assertExecutedOnce('StatisticsGen')
     self.assertExecutedOnce('Trainer.mnist')
     self.assertExecutedOnce('Transform')
@@ -109,7 +116,7 @@ class MNISTPipelineNativeKerasEndToEndTest(tf.test.TestCase):
     self.assertTrue(fileio.exists(self._metadata_path))
     metadata_config = metadata.sqlite_metadata_connection_config(
       self._metadata_path)
-    expected_execution_count = 9
+    expected_execution_count = 10
     with metadata.Metadata(metadata_config) as m:
       artifact_count = len(m.store.get_artifacts())
       execution_count = len(m.store.get_executions())

@@ -12,15 +12,15 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-"""Tests for Exporter."""
+"""Tests for FromCustomConfig."""
 import os
 
 import tensorflow as tf
 from tfx.types import channel_utils
 
-from tfx_x.components.configuration import artifacts
-from tfx_x.components.configuration.exporter import component
-from tfx_x.components.configuration.exporter.executor import PIPELINE_CONFIGURATION_KEY
+from tfx_x.types import artifacts
+from tfx_x.components.configuration.converter import component
+from tfx_x.components.configuration.converter.executor import PIPELINE_CONFIGURATION_KEY
 
 
 class ExportTest(tf.test.TestCase):
@@ -42,9 +42,10 @@ class ExportTest(tf.test.TestCase):
     pipeline_configuration = artifacts.PipelineConfiguration()
     pipeline_configuration.uri = self._output_configuration_dir
 
-    this_component = component.Exporter(custom_config=custom_config,
-                                        pipeline_configuration=channel_utils.as_channel([pipeline_configuration]),
-                                        instance_name=u'Testing123')
+    this_component = component.FromCustomConfig(custom_config=custom_config,
+                                                pipeline_configuration=channel_utils.as_channel(
+                                                  [pipeline_configuration]),
+                                                instance_name=u'Testing123')
     self.assertEqual(artifacts.PipelineConfiguration.TYPE_NAME,
                      this_component.outputs[PIPELINE_CONFIGURATION_KEY].type_name)
     artifact_collection = this_component.outputs[PIPELINE_CONFIGURATION_KEY].get()

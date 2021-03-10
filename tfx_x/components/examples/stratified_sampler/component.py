@@ -25,27 +25,31 @@ from tfx.dsl.components.base import executor_spec
 from tfx.types import ComponentSpec
 from tfx.types import standard_artifacts
 from tfx.types.component_spec import ChannelParameter, ExecutionParameter
+from tfx.utils import json_utils
 
 from tfx_x.components.examples.stratified_sampler import executor
-from tfx_x.components.examples.stratified_sampler.executor import SPLITS_TO_TRANSFORM_KEY, THRESHOLD_KEY, \
-  COUNT_PER_KEY_KEY, KEY_KEY, SPLITS_TO_COPY_KEY, SAMPLING_RESULT_KEY, EXAMPLES_KEY
+from tfx_x.components.examples.stratified_sampler.executor import SPLITS_TO_TRANSFORM_KEY, \
+  SAMPLES_PER_KEY_KEY, TO_KEY_FN_KEY, SPLITS_TO_COPY_KEY, STRATIFIED_EXAMPLES_KEY, EXAMPLES_KEY, \
+  PIPELINE_CONFIGURATION_KEY, TO_KEY_FN_KEY_KEY
+from tfx_x.types.artifacts import PipelineConfiguration
 
 
 class StratifiedSamplerSpec(ComponentSpec):
   """StratifiedSampler component spec."""
 
   PARAMETERS = {
-    SPLITS_TO_TRANSFORM_KEY: ExecutionParameter(type=List[Text], optional=True),
-    SPLITS_TO_COPY_KEY: ExecutionParameter(type=List[Text], optional=True),
-    KEY_KEY: ExecutionParameter(type=Text),
-    COUNT_PER_KEY_KEY: ExecutionParameter(type=int),
-    THRESHOLD_KEY: ExecutionParameter(type=float, optional=True),
+    SPLITS_TO_TRANSFORM_KEY: ExecutionParameter(type=(str, Text), optional=True),
+    SPLITS_TO_COPY_KEY: ExecutionParameter(type=(str, Text), optional=True),
+    TO_KEY_FN_KEY: ExecutionParameter(type=Text, optional=True),
+    TO_KEY_FN_KEY_KEY: ExecutionParameter(type=Text, optional=True),
+    SAMPLES_PER_KEY_KEY: ExecutionParameter(type=int, optional=True),
   }
   INPUTS = {
     EXAMPLES_KEY: ChannelParameter(type=standard_artifacts.Examples),
+    PIPELINE_CONFIGURATION_KEY: ChannelParameter(type=PipelineConfiguration, optional=True),
   }
   OUTPUTS = {
-    SAMPLING_RESULT_KEY: ChannelParameter(type=standard_artifacts.Examples),
+    STRATIFIED_EXAMPLES_KEY: ChannelParameter(type=standard_artifacts.Examples),
   }
 
 
@@ -66,34 +70,48 @@ class StratifiedSampler(base_component.BaseComponent):
   EXECUTOR_SPEC = executor_spec.ExecutorClassSpec(executor.Executor)
 
   def __init__(self,
-               key: Text,
                examples: types.Channel,
-               sampling_result: Optional[types.Channel] = None,
+               to_key_fn: Optional[Text] = None,
+               to_key_fn_key: Optional[Text] = 'to_key_fn',
+               pipeline_configuration: Optional[types.Channel] = None,
+               stratified_examples: Optional[types.Channel] = None,
                splits_to_transform: Optional[List[Text]] = None,
                splits_to_copy: Optional[List[Text]] = None,
-               count_per_key: Optional[int] = None,
-               threshold: Optional[float] = None,
+               samples_per_key: Optional[int] = None,
                instance_name: Optional[Text] = None):
     """Construct an StratifiedSampler component.
     Args:
-      examples: A Channel of 'ExamplesPath' type, usually produced by ExampleGen
+      examples: A Channel of 'Examples' type, usually produced by ExampleGen
         component. _required_
-      sampling_result: Channel of `ExamplesPath` to store the inference
+      pipeline_configuration: A Channel of 'PipelineConfiguration' type, usually produced by FromCustomConfig
+        component.
+      stratified_examples: Channel of `Examples` to store the inference
         results.
       splits_to_transform: Optional list of split names to transform.
       splits_to_copy: Optional list of split names to copy.
+      samples_per_key: Number of samples per key.
+      to_key_fn_key: the name of the key that contains the to_key_fn - default is 'to_key_fn'.
+      to_key_fn: To key function, the function that will extract the key - must be 'to_key: Example -> key
+                 For example something like:
+                 >>> def to_key(m):
+                       return m.features.feature['trip_miles'].float_list.value[0] > 42.
       instance_name: Optional name assigned to this specific instance of
         StratifiedSampler. Required only if multiple StratifiedSampler components are
         declared in the same pipeline.
     """
-    sampling_result = sampling_result or types.Channel(
+    stratified_examples = stratified_examples or types.Channel(
       type=standard_artifacts.Examples)
+
+    if stratified_examples is None:
+      stratified_examples = types.Channel(type=standard_artifacts.Examples, matching_channel_name='examples')
+
     spec = StratifiedSamplerSpec(
       examples=examples,
-      sampling_result=sampling_result,
-      splits_to_transform=splits_to_transform,
-      splits_to_copy=splits_to_copy,
-      key=key,
-      count_per_key=count_per_key,
-      threshold=threshold)
+      pipeline_configuration=pipeline_configuration,
+      stratified_examples=stratified_examples,
+      splits_to_transform=json_utils.dumps(splits_to_transform),
+      splits_to_copy=json_utils.dumps(splits_to_copy),
+      to_key_fn=to_key_fn,
+      to_key_fn_key=to_key_fn_key,
+      samples_per_key=samples_per_key)
     super(StratifiedSampler, self).__init__(spec=spec, instance_name=instance_name)

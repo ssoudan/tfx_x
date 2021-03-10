@@ -1,3 +1,17 @@
+#  Copyright 2021 ssoudan. All Rights Reserved.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
 # Lint as: python2, python3
 # Copyright 2019 Google LLC. All Rights Reserved.
 #
@@ -39,7 +53,8 @@ from tfx.orchestration.beam.beam_dag_runner import BeamDagRunner
 from tfx.proto import pusher_pb2
 from tfx.proto import trainer_pb2
 
-from tfx_x.components.configuration.exporter.component import Exporter
+from tfx_x.components.configuration.converter.component import FromCustomConfig
+from tfx_x.components.examples.stratified_sampler.component import StratifiedSampler
 
 _pipeline_name = 'mnist_native_keras'
 
@@ -83,10 +98,18 @@ def _create_pipeline(pipeline_name: Text, pipeline_root: Text, data_root: Text,
                      beam_pipeline_args: List[Text]) -> pipeline.Pipeline:
   """Implements the handwritten digit classification example using TFX."""
   # Store the configuration along with the pipeline run so results can be reproduced
-  config_exporter = Exporter(custom_config=custom_config)
+  pipeline_configuration = FromCustomConfig(custom_config=custom_config)
 
   # Brings data into the pipeline.
   example_gen = ImportExampleGen(input_base=data_root)
+
+  # Create a stratified dataset for evaluation
+  stratified_examples = StratifiedSampler(examples=example_gen.outputs['examples'],
+                                          pipeline_configuration=pipeline_configuration.outputs[
+                                            'pipeline_configuration'],
+                                          samples_per_key=1200,
+                                          splits_to_transform=['eval'],
+                                          splits_to_copy=['train'])
 
   # Computes statistics over data for visualization and example validation.
   statistics_gen = StatisticsGen(examples=example_gen.outputs['examples'])
@@ -135,7 +158,7 @@ def _create_pipeline(pipeline_name: Text, pipeline_root: Text, data_root: Text,
 
   # Uses TFMA to compute the evaluation statistics over features of a model.
   evaluator = Evaluator(
-    examples=example_gen.outputs['examples'],
+    examples=stratified_examples.outputs['stratified_examples'],
     model=trainer.outputs['model'],
     eval_config=eval_config,
     instance_name='mnist')
@@ -154,8 +177,9 @@ def _create_pipeline(pipeline_name: Text, pipeline_root: Text, data_root: Text,
     pipeline_name=pipeline_name,
     pipeline_root=pipeline_root,
     components=[
-      config_exporter,
+      pipeline_configuration,
       example_gen,
+      stratified_examples,
       statistics_gen,
       schema_gen,
       example_validator,
@@ -175,7 +199,13 @@ def _create_pipeline(pipeline_name: Text, pipeline_root: Text, data_root: Text,
 if __name__ == '__main__':
   absl.logging.set_verbosity(absl.logging.INFO)
 
-  _custom_config = {'layer_count': 3}
+  to_key_fn = """
+def to_key(m):
+  return m.features.feature['trip_miles'].float_list.value[0] > 42.
+"""
+
+  _custom_config = {'layer_count': 3,
+                    'to_key_fn': to_key_fn}
 
   BeamDagRunner().run(
     _create_pipeline(

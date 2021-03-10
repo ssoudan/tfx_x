@@ -13,7 +13,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 """
-PipelineConfiguration exporter component
+PipelineConfiguration converter component
 """
 
 from typing import Optional, Text, Dict, Any
@@ -26,13 +26,13 @@ from tfx.types.component_spec import ChannelParameter
 from tfx.types.component_spec import ExecutionParameter
 from tfx.utils import json_utils
 
-from tfx_x.components.configuration import artifacts
-from tfx_x.components.configuration.exporter import executor
-from tfx_x.components.configuration.exporter.executor import CUSTOM_CONFIG_KEY, PIPELINE_CONFIGURATION_KEY
+from tfx_x.components.configuration.converter import executor
+from tfx_x.components.configuration.converter.executor import CUSTOM_CONFIG_KEY, PIPELINE_CONFIGURATION_KEY
+from tfx_x.types import artifacts
 
 
-class ExporterSpec(types.ComponentSpec):
-  """ComponentSpec configuration exporter component."""
+class FromCustomConfigSpec(types.ComponentSpec):
+  """ComponentSpec configuration converter component."""
 
   PARAMETERS = {
     # These are parameters that will be passed in the call to
@@ -47,20 +47,20 @@ class ExporterSpec(types.ComponentSpec):
   }
 
 
-class Exporter(base_component.BaseComponent):
-  """Exporter configuration.
+class FromCustomConfig(base_component.BaseComponent):
+  """FromCustomConfig configuration.
 
   This custom component class consists of only a constructor.
   """
 
-  SPEC_CLASS = ExporterSpec
+  SPEC_CLASS = FromCustomConfigSpec
   EXECUTOR_SPEC = executor_spec.ExecutorClassSpec(executor.Executor)
 
   def __init__(self,
                custom_config: Optional[Dict[Text, Any]] = None,
                pipeline_configuration: types.Channel = None,
                instance_name: Optional[Text] = None):
-    """Construct a pipeline configuration exporter component.
+    """Construct a pipeline configuration converter component.
 
     Args:
       pipeline_configuration: A Channel of type `artifacts.PipelineConfiguration`.
@@ -73,7 +73,7 @@ class Exporter(base_component.BaseComponent):
     if not custom_config:
       custom_config = {}
 
-    spec = ExporterSpec(custom_config=json_utils.dumps(custom_config),
-                        pipeline_configuration=pipeline_configuration)
-    super(Exporter, self).__init__(spec=spec,
-                                   instance_name=instance_name)
+    spec = FromCustomConfigSpec(custom_config=json_utils.dumps(custom_config),
+                                pipeline_configuration=pipeline_configuration)
+    super(FromCustomConfig, self).__init__(spec=spec,
+                                           instance_name=instance_name)
