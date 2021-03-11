@@ -157,6 +157,25 @@ def to_key(m):
     self._verify_copied_example_split('unlabelled')
     self._verify_stratified_example_split('eval')
 
+  def testDoWithOutputExamplesTwoSplitsSampledOneSplitCopied(self):
+    self._exec_properties[SPLITS_TO_TRANSFORM_KEY] = json.dumps(['train', 'eval'])
+    self._exec_properties[SPLITS_TO_COPY_KEY] = json.dumps(['unlabelled'])
+
+    # Run executor.
+    stratified_sampler = executor.Executor(self._context)
+    stratified_sampler.Do(self._input_dict, self._output_dict_sr,
+                          self._exec_properties)
+
+    # Check outputs.
+    self.assertTrue(fileio.exists(self._stratified_examples_dir))
+    self.assertIn('train', artifact_utils.decode_split_names(self._sampling_result.split_names))
+    self.assertIn('eval', artifact_utils.decode_split_names(self._sampling_result.split_names))
+    self.assertIn('unlabelled', artifact_utils.decode_split_names(self._sampling_result.split_names))
+    self.assertLen(artifact_utils.decode_split_names(self._sampling_result.split_names), 3)
+    self._verify_stratified_example_split('train')
+    self._verify_copied_example_split('unlabelled')
+    self._verify_stratified_example_split('eval')
+
 
 if __name__ == '__main__':
   tf.test.main()

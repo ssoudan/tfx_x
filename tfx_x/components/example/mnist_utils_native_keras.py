@@ -24,8 +24,8 @@ from __future__ import print_function
 
 import tensorflow as tf
 import tensorflow_transform as tft
-
 from tfx.components.trainer.fn_args_utils import FnArgs
+
 from tfx_x.components.example import mnist_utils_native_keras_base as base
 
 
@@ -81,19 +81,19 @@ def run_fn(fn_args: FnArgs):
 
   # Write logs to path
   tensorboard_callback = tf.keras.callbacks.TensorBoard(
-      log_dir=fn_args.model_run_dir, update_freq='batch')
+    log_dir=fn_args.model_run_dir, update_freq='batch')
 
   model.fit(
-      train_dataset,
-      steps_per_epoch=fn_args.train_steps,
-      validation_data=eval_dataset,
-      validation_steps=fn_args.eval_steps,
-      callbacks=[tensorboard_callback])
+    train_dataset,
+    steps_per_epoch=fn_args.train_steps,
+    validation_data=eval_dataset,
+    validation_steps=fn_args.eval_steps,
+    callbacks=[tensorboard_callback])
 
   signatures = {
-      'serving_default':
-          _get_serve_tf_examples_fn(
-              model, tf_transform_output).get_concrete_function(
-                  tf.TensorSpec(shape=[None], dtype=tf.string, name='examples'))
+    'serving_default':
+      _get_serve_tf_examples_fn(
+        model, tf_transform_output).get_concrete_function(
+        tf.TensorSpec(shape=[None], dtype=tf.string, name='examples'))
   }
   model.save(fn_args.serving_model_dir, save_format='tf', signatures=signatures)

@@ -53,6 +53,7 @@ from tfx.orchestration.beam.beam_dag_runner import BeamDagRunner
 from tfx.proto import pusher_pb2
 from tfx.proto import trainer_pb2
 
+from tfx_x.components import Filter
 from tfx_x.components.configuration.converter.component import FromCustomConfig
 from tfx_x.components.examples.stratified_sampler.component import StratifiedSampler
 
@@ -103,14 +104,6 @@ def _create_pipeline(pipeline_name: Text, pipeline_root: Text, data_root: Text,
   # Brings data into the pipeline.
   example_gen = ImportExampleGen(input_base=data_root)
 
-  # Create a stratified dataset for evaluation
-  stratified_examples = StratifiedSampler(examples=example_gen.outputs['examples'],
-                                          pipeline_configuration=pipeline_configuration.outputs[
-                                            'pipeline_configuration'],
-                                          samples_per_key=1200,
-                                          splits_to_transform=['eval'],
-                                          splits_to_copy=['train'])
-
   # Computes statistics over data for visualization and example validation.
   statistics_gen = StatisticsGen(examples=example_gen.outputs['examples'])
 
@@ -123,9 +116,24 @@ def _create_pipeline(pipeline_name: Text, pipeline_root: Text, data_root: Text,
     statistics=statistics_gen.outputs['statistics'],
     schema=schema_gen.outputs['schema'])
 
+  # Create a filtered dataset - today we only want a model for small digits
+  filter = Filter(examples=example_gen.outputs['examples'],
+                  pipeline_configuration=pipeline_configuration.outputs[
+                    'pipeline_configuration'],
+                  splits_to_transform=['train', 'eval'],
+                  splits_to_copy=[])
+
+  # Create a stratified dataset for evaluation
+  stratified_examples = StratifiedSampler(examples=filter.outputs['filtered_examples'],
+                                          pipeline_configuration=pipeline_configuration.outputs[
+                                            'pipeline_configuration'],
+                                          samples_per_key=1200,
+                                          splits_to_transform=['eval'],
+                                          splits_to_copy=['train'])
+
   # Performs transformations and feature engineering in training and serving.
   transform = Transform(
-    examples=example_gen.outputs['examples'],
+    examples=filter.outputs['filtered_examples'],
     schema=schema_gen.outputs['schema'],
     module_file=module_file)
 
@@ -179,6 +187,7 @@ def _create_pipeline(pipeline_name: Text, pipeline_root: Text, data_root: Text,
     components=[
       pipeline_configuration,
       example_gen,
+      filter,
       stratified_examples,
       statistics_gen,
       schema_gen,
@@ -201,11 +210,17 @@ if __name__ == '__main__':
 
   to_key_fn = """
 def to_key(m):
-  return m.features.feature['trip_miles'].float_list.value[0] > 42.
+  return m.features.feature['trip_miles'].float_list.value[0] > 21.
+"""
+
+  predicate_fn = """
+def predicate(m):  
+  return m.features.feature['trip_miles'].float_list.value[0] < 42.
 """
 
   _custom_config = {'layer_count': 3,
-                    'to_key_fn': to_key_fn}
+                    'to_key_fn': to_key_fn,
+                    'predicate_fn': predicate_fn}
 
   BeamDagRunner().run(
     _create_pipeline(
@@ -215,6 +230,5 @@ def to_key(m):
       custom_config=_custom_config,
       module_file=_module_file,
       serving_model_dir=_serving_model_dir,
-      serving_model_dir_lite=_serving_model_dir_lite,
       metadata_path=_metadata_path,
       beam_pipeline_args=_beam_pipeline_args))

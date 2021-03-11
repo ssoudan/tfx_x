@@ -58,10 +58,10 @@ def input_fn(file_pattern: List[Text],
       dictionary of Tensors, and indices is a single Tensor of label indices.
   """
   return data_accessor.tf_dataset_factory(
-      file_pattern,
-      dataset_options.TensorFlowDatasetOptions(
-          batch_size=batch_size, label_key=transformed_name(LABEL_KEY)),
-      tf_transform_output.transformed_metadata.schema).repeat()
+    file_pattern,
+    dataset_options.TensorFlowDatasetOptions(
+      batch_size=batch_size, label_key=transformed_name(LABEL_KEY)),
+    tf_transform_output.transformed_metadata.schema).repeat()
 
 
 def build_keras_model(custom_config: Dict[Text, Any]) -> tf.keras.Model:
@@ -80,16 +80,16 @@ def build_keras_model(custom_config: Dict[Text, Any]) -> tf.keras.Model:
   # https://www.tensorflow.org/guide/keras/overview for all API options.
   model = tf.keras.Sequential()
   model.add(
-      tf.keras.layers.InputLayer(
-          input_shape=(784,), name=transformed_name(IMAGE_KEY)))
+    tf.keras.layers.InputLayer(
+      input_shape=(784,), name=transformed_name(IMAGE_KEY)))
   for layer in range(layer_count):
     model.add(tf.keras.layers.Dense(64, activation='relu'))
     model.add(tf.keras.layers.Dropout(0.2))
   model.add(tf.keras.layers.Dense(10, activation='softmax'))
   model.compile(
-      loss='sparse_categorical_crossentropy',
-      optimizer=tf.keras.optimizers.RMSprop(lr=0.0015),
-      metrics=['sparse_categorical_accuracy'])
+    loss='sparse_categorical_crossentropy',
+    optimizer=tf.keras.optimizers.RMSprop(lr=0.0015),
+    metrics=['sparse_categorical_accuracy'])
   model.summary(print_fn=absl.logging.info)
   return model
 
@@ -109,7 +109,7 @@ def preprocessing_fn(inputs):
   # The input float values for the image encoding are in the range [-0.5, 0.5].
   # So scale_by_min_max is a identity operation, since the range is preserved.
   outputs[transformed_name(IMAGE_KEY)] = (
-      tft.scale_by_min_max(inputs[IMAGE_KEY], -0.5, 0.5))
+    tft.scale_by_min_max(inputs[IMAGE_KEY], -0.5, 0.5))
   # Do not apply label transformation as it will result in wrong evaluation.
   outputs[transformed_name(LABEL_KEY)] = inputs[LABEL_KEY]
 

@@ -49,12 +49,12 @@ class ExecutorTest(tf.test.TestCase):
     }
 
     # Create output dict.
-    self._sampling_result = standard_artifacts.Examples()
+    self._filtering_result = standard_artifacts.Examples()
     self._filtered_examples_dir = os.path.join(self._output_data_dir, "something")
-    self._sampling_result.uri = self._filtered_examples_dir
+    self._filtering_result.uri = self._filtered_examples_dir
 
     self._output_dict_sr = {
-      FILTERED_EXAMPLES_KEY: [self._sampling_result],
+      FILTERED_EXAMPLES_KEY: [self._filtering_result],
     }
 
     # Create exe properties.
@@ -116,9 +116,9 @@ def predicate(m):
     # Check outputs.
     self.assertTrue(fileio.exists(self._filtered_examples_dir))
     # self._verify_example_split('train')
-    self.assertNotIn('train', artifact_utils.decode_split_names(self._sampling_result.split_names))
-    self.assertIn('eval', artifact_utils.decode_split_names(self._sampling_result.split_names))
-    self.assertLen(artifact_utils.decode_split_names(self._sampling_result.split_names), 1)
+    self.assertNotIn('train', artifact_utils.decode_split_names(self._filtering_result.split_names))
+    self.assertIn('eval', artifact_utils.decode_split_names(self._filtering_result.split_names))
+    self.assertLen(artifact_utils.decode_split_names(self._filtering_result.split_names), 1)
     self._verify_filtered_example_split('eval')
 
   def testDoWithOutputExamplesAllSplits(self):
@@ -131,9 +131,9 @@ def predicate(m):
 
     # Check outputs.
     self.assertTrue(fileio.exists(self._filtered_examples_dir))
-    self.assertIn('train', artifact_utils.decode_split_names(self._sampling_result.split_names))
-    self.assertIn('eval', artifact_utils.decode_split_names(self._sampling_result.split_names))
-    self.assertLen(artifact_utils.decode_split_names(self._sampling_result.split_names), 2)
+    self.assertIn('train', artifact_utils.decode_split_names(self._filtering_result.split_names))
+    self.assertIn('eval', artifact_utils.decode_split_names(self._filtering_result.split_names))
+    self.assertLen(artifact_utils.decode_split_names(self._filtering_result.split_names), 2)
     self._verify_filtered_example_split('train')
     self._verify_filtered_example_split('eval')
 
@@ -148,11 +148,30 @@ def predicate(m):
 
     # Check outputs.
     self.assertTrue(fileio.exists(self._filtered_examples_dir))
-    self.assertIn('train', artifact_utils.decode_split_names(self._sampling_result.split_names))
-    self.assertIn('eval', artifact_utils.decode_split_names(self._sampling_result.split_names))
-    self.assertIn('unlabelled', artifact_utils.decode_split_names(self._sampling_result.split_names))
-    self.assertLen(artifact_utils.decode_split_names(self._sampling_result.split_names), 3)
+    self.assertIn('train', artifact_utils.decode_split_names(self._filtering_result.split_names))
+    self.assertIn('eval', artifact_utils.decode_split_names(self._filtering_result.split_names))
+    self.assertIn('unlabelled', artifact_utils.decode_split_names(self._filtering_result.split_names))
+    self.assertLen(artifact_utils.decode_split_names(self._filtering_result.split_names), 3)
     self._verify_copied_example_split('train')
+    self._verify_copied_example_split('unlabelled')
+    self._verify_filtered_example_split('eval')
+
+  def testDoWithOutputExamplesTwoSplitsSampledOneSplitCopied(self):
+    self._exec_properties[SPLITS_TO_TRANSFORM_KEY] = json.dumps(['train', 'eval'])
+    self._exec_properties[SPLITS_TO_COPY_KEY] = json.dumps(['unlabelled'])
+
+    # Run executor.
+    stratified_sampler = executor.Executor(self._context)
+    stratified_sampler.Do(self._input_dict, self._output_dict_sr,
+                          self._exec_properties)
+
+    # Check outputs.
+    self.assertTrue(fileio.exists(self._filtered_examples_dir))
+    self.assertIn('train', artifact_utils.decode_split_names(self._filtering_result.split_names))
+    self.assertIn('eval', artifact_utils.decode_split_names(self._filtering_result.split_names))
+    self.assertIn('unlabelled', artifact_utils.decode_split_names(self._filtering_result.split_names))
+    self.assertLen(artifact_utils.decode_split_names(self._filtering_result.split_names), 3)
+    self._verify_filtered_example_split('train')
     self._verify_copied_example_split('unlabelled')
     self._verify_filtered_example_split('eval')
 

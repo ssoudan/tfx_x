@@ -57,8 +57,15 @@ def to_key(m):
   return m.features.feature['image_class'].int64_list.value[0]
 """
 
+    predicate_fn = """
+def predicate(m):  
+  return m.features.feature['image_class'].int64_list.value[0] < 4
+    """
+
     self._custom_config = {'layer_count': 3,
-                           'to_key_fn': to_key_fn}
+                           'to_key_fn': to_key_fn,
+                           'predicate_fn': predicate_fn}
+
     self._module_file = os.path.join(
       os.path.dirname(__file__), 'mnist_utils_native_keras.py')
     self._serving_model_dir = os.path.join(self._test_dir, 'serving_model')
@@ -93,6 +100,7 @@ def to_key(m):
     self.assertExecutedOnce('ExampleValidator')
     self.assertExecutedOnce('Pusher.mnist')
     self.assertExecutedOnce('SchemaGen')
+    self.assertExecutedOnce('Filter')
     self.assertExecutedOnce('StratifiedSampler')
     self.assertExecutedOnce('StatisticsGen')
     self.assertExecutedOnce('Trainer.mnist')
@@ -116,7 +124,7 @@ def to_key(m):
     self.assertTrue(fileio.exists(self._metadata_path))
     metadata_config = metadata.sqlite_metadata_connection_config(
       self._metadata_path)
-    expected_execution_count = 10
+    expected_execution_count = 11
     with metadata.Metadata(metadata_config) as m:
       artifact_count = len(m.store.get_artifacts())
       execution_count = len(m.store.get_executions())
