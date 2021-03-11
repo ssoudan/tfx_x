@@ -1,11 +1,13 @@
 # Extensions for TFX
 
-Sebastien Soudan <sebastien.soudan@gmail.com>
+Sebastien Soudan (<sebastien.soudan@gmail.com>)
 
-## License
-See LICENSE file.
+## Description
+[TFX](https://www.tensorflow.org/tfx) is a framework to develop and deploy production ML pipelines. 
+Pipelines are made of components that consume and produce artifacts. This library provides some new 
+components and artifacts.  
 
-## Collection of custom components for TFX
+## Library of components for TFX
 
 Around:
 - [configuration](./tfx_x/components/configuration/README.md)
@@ -14,6 +16,9 @@ Around:
 
 ## Installation
 
-Until packages are published:
+Until a package properly is published:
 
     pip install --force-reinstall git+https://github.com/ssoudan/tfx_x
+
+## License
+See [LICENSE](./LICENSE) file.

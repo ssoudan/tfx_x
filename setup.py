@@ -44,19 +44,8 @@ def _make_required_install_packages():
   # six, and protobuf) with TF.
   return [
     # LINT.IfChange
-    'apache-beam[gcp]>=2.27,<3',
-    'click>=7,<8',
-    'google-api-python-client>=1.7.8,<2',
-    'grpcio>=1.28.1,<2',
     'numpy>=1.16,<1.20',
-    'pyarrow>=1,<3',
-    'pyyaml>=3.12,<6',
-    'tfx>=0.27',
-    'tensorflow>=1.15.2,!=2.0.*,!=2.1.*,!=2.2.*,!=2.3.*,<3',
-    'tfx-bsl' + select_constraint(
-      default='>=0.27,<0.28',
-      nightly='>=0.28.0.dev',
-      git_master='@git+https://github.com/tensorflow/tfx-bsl@master'),
+    'tfx>=0.27'
   ]
 
 
