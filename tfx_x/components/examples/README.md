@@ -5,6 +5,8 @@
 These components deal with transformation of Examples.
 
 - `StratifiedSampler` does 'stratified sampling' on the input examples
+- `Filter` filters the examples based on the provided predicate. 
+- `Sample` - to come 
 
 ## Usage
 
@@ -30,7 +32,7 @@ def create_pipeline(...):
                                          to_key_fn=to_key_fn)
   ...
   # Use its output
-  my_custom_component = MyComponent(examples=stratified_sampler.outputs['stratified_examples'])
+  my_custom_component = MyComponent(examples=stratified_sampler.outputs['filtered_examples'])
   ...
   return pipeline.Pipeline(
     pipeline_name=pipeline_name,
