@@ -18,11 +18,12 @@ from typing import Optional, Text
 from tfx import types
 from tfx.dsl.components.base import base_component
 from tfx.dsl.components.base import executor_spec
-from tfx.examples.custom_components.hello_world.hello_component import executor
 from tfx.types import channel_utils
 from tfx.types import standard_artifacts
 from tfx.types.component_spec import ChannelParameter
 from tfx.types.component_spec import ExecutionParameter
+
+from tfx_x.components.model.transform import executor
 
 
 class TransformSpec(types.ComponentSpec):

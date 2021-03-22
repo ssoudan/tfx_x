@@ -49,12 +49,12 @@ class ExecutorTest(tf.test.TestCase):
     )
     model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
-    model.save(self._model_data_dir)
+    model.save(os.path.join(self._model_data_dir, 'serving_model_dir'))
     del model
 
     # Create input dict.
     self._model = standard_artifacts.Model()
-    self._model.uri = os.path.join(self._model_data_dir)
+    self._model.uri = self._model_data_dir
 
     self._input_dict = {
       INPUT_MODEL_KEY: [self._model],

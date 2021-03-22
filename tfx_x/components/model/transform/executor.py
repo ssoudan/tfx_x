@@ -13,6 +13,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 import importlib
+import os
 from typing import Any, Dict, List, Text, Optional
 
 import tensorflow as tf
@@ -80,10 +81,10 @@ class Executor(base_executor.BaseExecutor):
     output_dir = artifact_utils.get_single_uri([output_model])
 
     # load the model
-    model = tf.keras.models.load_model(input_dir)
+    model = tf.keras.models.load_model(os.path.join(input_dir, 'serving_model_dir'))
 
     # transform
     new_model, signatures, options = fn(model)
 
     # save the model
-    tf.saved_model.save(model, output_dir, signatures, options)
+    tf.saved_model.save(model, os.path.join(output_dir, 'serving_model_dir'), signatures, options)
