@@ -12,8 +12,3 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-
-from tfx_x.components.configuration.converter.component import FromCustomConfig
-from tfx_x.components.examples.filter.component import Filter
-from tfx_x.components.examples.stratified_sampler.component import StratifiedSampler
-from tfx_x.components.model.transform.component import Transform

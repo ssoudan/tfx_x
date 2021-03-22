@@ -12,6 +12,7 @@ components and artifacts.
 Around:
 - [configuration](./tfx_x/components/configuration/README.md)
 - [examples](./tfx_x/components/examples/README.md)
+- [model](./tfx_x/components/model/README.md)
 - ...
 
 ## Installation
