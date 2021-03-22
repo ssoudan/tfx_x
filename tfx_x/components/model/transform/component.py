@@ -29,7 +29,6 @@ class TransformSpec(types.ComponentSpec):
   """ComponentSpec for model Transform Component."""
 
   PARAMETERS = {
-    'instance_name': ExecutionParameter(type=Text),
     'function_name': ExecutionParameter(type=Text),
   }
   INPUTS = {
@@ -69,4 +68,4 @@ class Transform(base_component.BaseComponent):
                          input_model=input_model,
                          output_model=output_model,
                          instance_name=instance_name)
-    super(Transform, self).__init__(spec=spec)
+    super(Transform, self).__init__(spec=spec, instance_name=instance_name)
