@@ -13,9 +13,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 import importlib
-from typing import Any, Dict, List, Text
+from typing import Any, Dict, List, Text, Optional
 
 import tensorflow as tf
+from tensorflow.python.saved_model.save_options import SaveOptions
 from tfx import types
 from tfx.dsl.components.base import base_executor
 from tfx.types import artifact_utils
@@ -25,8 +26,8 @@ INPUT_MODEL_KEY = 'input_model'
 FUNCTION_NAME_KEY = 'function_name'
 
 
-def identity(model: tf.keras.Model) -> tf.keras.Model:
-  return model
+def identity(model: tf.keras.Model) -> (tf.keras.Model, Dict[Text, Any], Optional[SaveOptions]):
+  return model, None, None
 
 
 class Executor(base_executor.BaseExecutor):
@@ -82,7 +83,7 @@ class Executor(base_executor.BaseExecutor):
     model = tf.keras.models.load_model(input_dir)
 
     # transform
-    new_model = fn(model)
+    new_model, signatures, options = fn(model)
 
     # save the model
-    new_model.save(output_dir)
+    tf.saved_model.save(model, output_dir, signatures, options)
