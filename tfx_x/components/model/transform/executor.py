@@ -13,6 +13,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 import importlib
+import json
 import os
 from typing import Any, Dict, List, Text, Optional
 
@@ -21,13 +22,16 @@ from tensorflow.python.saved_model.save_options import SaveOptions
 from tfx import types
 from tfx.dsl.components.base import base_executor
 from tfx.types import artifact_utils
+from tfx.utils import io_utils
 
 OUTPUT_MODEL_KEY = 'output_model'
 INPUT_MODEL_KEY = 'input_model'
 FUNCTION_NAME_KEY = 'function_name'
+PIPELINE_CONFIGURATION_KEY = 'pipeline_configuration'
 
 
-def identity(model: tf.keras.Model) -> (tf.keras.Model, Dict[Text, Any], Optional[SaveOptions]):
+def identity(model: tf.keras.Model, pipeline_configuration: Dict[Text, Any]) -> (
+    tf.keras.Model, Dict[Text, Any], Optional[SaveOptions]):
   return model, None, None
 
 
@@ -45,6 +49,7 @@ class Executor(base_executor.BaseExecutor):
     Args:
       input_dict: Input dict from input key to a list of artifacts, including:
         - input_model: A list of type `standard_artifacts.Model`
+        - pipeline_configuration: optional PipelineConfiguration artifact.
       output_dict: Output dict from key to a list of artifacts, including:
         - output_model: A list of type `standard_artifacts.Model`
       exec_properties: A dict of execution properties, including:
@@ -67,6 +72,13 @@ class Executor(base_executor.BaseExecutor):
       output_dict[OUTPUT_MODEL_KEY])
     function_name = exec_properties.get(FUNCTION_NAME_KEY, 'tfx_x.components.model.transform.executor.identity')
 
+    pipeline_configuration = {}
+    if PIPELINE_CONFIGURATION_KEY in input_dict:
+      pipeline_configuration_dir = artifact_utils.get_single_uri(input_dict[PIPELINE_CONFIGURATION_KEY])
+      pipeline_configuration_file = os.path.join(pipeline_configuration_dir, 'custom_config.json')
+      pipeline_configuration_str = io_utils.read_string_file(pipeline_configuration_file)
+      pipeline_configuration = json.loads(pipeline_configuration_str)
+
     # check if function_name can be found
     function_name_split = function_name.split('.')
     module_name = '.'.join(function_name_split[0:-1])
@@ -84,7 +96,7 @@ class Executor(base_executor.BaseExecutor):
     model = tf.keras.models.load_model(os.path.join(input_dir, 'serving_model_dir'))
 
     # transform
-    new_model, signatures, options = fn(model)
+    new_model, signatures, options = fn(model, pipeline_configuration)
 
     # save the model
     tf.saved_model.save(model, os.path.join(output_dir, 'serving_model_dir'), signatures, options)

@@ -23,20 +23,24 @@ from tfx.types import standard_artifacts
 from tfx.types.component_spec import ChannelParameter
 from tfx.types.component_spec import ExecutionParameter
 
+from tfx_x import PipelineConfiguration
 from tfx_x.components.model.transform import executor
+from tfx_x.components.model.transform.executor import OUTPUT_MODEL_KEY, INPUT_MODEL_KEY, FUNCTION_NAME_KEY, \
+  PIPELINE_CONFIGURATION_KEY
 
 
 class TransformSpec(types.ComponentSpec):
   """ComponentSpec for model Transform Component."""
 
   PARAMETERS = {
-    'function_name': ExecutionParameter(type=Text),
+    FUNCTION_NAME_KEY: ExecutionParameter(type=Text),
   }
   INPUTS = {
-    'input_model': ChannelParameter(type=standard_artifacts.Model),
+    INPUT_MODEL_KEY: ChannelParameter(type=standard_artifacts.Model),
+    PIPELINE_CONFIGURATION_KEY: ChannelParameter(type=PipelineConfiguration, optional=True),
   }
   OUTPUTS = {
-    'output_model': ChannelParameter(type=standard_artifacts.Model),
+    OUTPUT_MODEL_KEY: ChannelParameter(type=standard_artifacts.Model),
   }
 
 
@@ -52,12 +56,14 @@ class Transform(base_component.BaseComponent):
                function_name: Text = None,
                input_model: types.Channel = None,
                output_model: types.Channel = None,
+               pipeline_configuration: Optional[types.Channel] = None,
                instance_name: Optional[Text] = None):
     """Construct a model transformation component.
 
     Args:
       function_name: The instance_name of the function to apply on the model.
       input_model: A Channel of type `standard_artifacts.Model`.
+      pipeline_configuration: A Channel of 'PipelineConfiguration' type, usually produced by FromCustomConfig component.
       output_model: A Channel of type `standard_artifacts.Model`.
       instance_name: The instance_name of the instance - Optional.
     """
@@ -66,6 +72,7 @@ class Transform(base_component.BaseComponent):
       output_model = channel_utils.as_channel([standard_artifacts.Model()])
 
     spec = TransformSpec(function_name=function_name,
+                         pipeline_configuration=pipeline_configuration,
                          input_model=input_model,
                          output_model=output_model,
                          instance_name=instance_name)

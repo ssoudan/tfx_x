@@ -21,8 +21,8 @@ from tfx_x.components.model.transform import component
 from tfx_x.components.model.transform.executor import OUTPUT_MODEL_KEY
 
 
-def pouet(model):
-  return model
+def pouet(model, _pipeline_configuration):
+  return model, None, None
 
 
 class TransformTest(tf.test.TestCase):
