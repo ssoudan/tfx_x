@@ -12,9 +12,3 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-
-
-from tfx_x.types.artifacts import PipelineConfiguration
-from tfx_x.types.artifacts import ExportedModel
-# Import version string.
-from tfx_x.version import __version__

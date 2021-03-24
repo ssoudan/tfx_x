@@ -15,45 +15,45 @@
 import importlib
 import json
 import os
-from typing import Any, Dict, List, Text, Optional
+from typing import Any, Dict, List, Text
 
 import tensorflow as tf
-from tensorflow.python.saved_model.save_options import SaveOptions
 from tfx import types
-from tfx.dsl.components.base import base_executor
+from tfx.components.pusher import executor as tfx_pusher_executor
 from tfx.types import artifact_utils
 from tfx.utils import io_utils
 
-OUTPUT_MODEL_KEY = 'output_model'
-INPUT_MODEL_KEY = 'input_model'
+OUTPUT_KEY = 'output'
+MODEL_KEY = 'model'
 FUNCTION_NAME_KEY = 'function_name'
 PIPELINE_CONFIGURATION_KEY = 'pipeline_configuration'
 
 
-def identity(model: tf.keras.Model, pipeline_configuration: Dict[Text, Any]) -> (
-    tf.keras.Model, Dict[Text, Any], Optional[SaveOptions]):
-  return model, None, None
+def noop(_model: tf.keras.Model, _pipeline_configuration: Dict[Text, Any], _output_dir: Text):
+  pass
 
 
-class Executor(base_executor.BaseExecutor):
-  """Executor for Transform."""
+class Executor(tfx_pusher_executor.Executor):
+  """Executor for Export."""
 
   def Do(self,
          input_dict: Dict[Text, List[types.Artifact]],
          output_dict: Dict[Text, List[types.Artifact]],
          exec_properties: Dict[Text, Any]) -> None:
-    """Transform a model with the provided function.
+    """Export a model with the provided function.
 
     ...
 
     Args:
       input_dict: Input dict from input key to a list of artifacts, including:
-        - input_model: A list of type `standard_artifacts.Model`
+        - model: A list of type `standard_artifacts.Model`
         - pipeline_configuration: optional PipelineConfiguration artifact.
+        - model_blessing: optional model blessing artifact.
+        - infra_blessing: optional infra blessing artifact.
       output_dict: Output dict from key to a list of artifacts, including:
-        - output_model: A list of type `standard_artifacts.Model`
+        - output: model export artifact.
       exec_properties: A dict of execution properties, including:
-        - function_name: The name of the function to apply on the model - identity function is used if not specified.
+        - function_name: The name of the function to apply on the model - noop function is used if not specified.
         - instance_name: Optional unique instance_name. Necessary iff multiple Hello components
           are declared in the same pipeline.
 
@@ -66,11 +66,16 @@ class Executor(base_executor.BaseExecutor):
     """
     self._log_startup(input_dict, output_dict, exec_properties)
 
-    input_model = artifact_utils.get_single_instance(
-      input_dict[INPUT_MODEL_KEY])
-    output_model = artifact_utils.get_single_instance(
-      output_dict[OUTPUT_MODEL_KEY])
-    function_name = exec_properties.get(FUNCTION_NAME_KEY, 'tfx_x.components.model.transform.executor.identity')
+    if not self.CheckBlessing(input_dict):
+      return
+
+    model = artifact_utils.get_single_instance(
+      input_dict[MODEL_KEY])
+
+    output = artifact_utils.get_single_instance(
+      output_dict[OUTPUT_KEY])
+
+    function_name = exec_properties.get(FUNCTION_NAME_KEY, 'tfx_x.components.model.export.executor.noop')
 
     pipeline_configuration = {}
     if PIPELINE_CONFIGURATION_KEY in input_dict:
@@ -89,14 +94,11 @@ class Executor(base_executor.BaseExecutor):
     if fn is None:
       raise ValueError('`function_name` not found')
 
-    input_dir = artifact_utils.get_single_uri([input_model])
-    output_dir = artifact_utils.get_single_uri([output_model])
+    input_dir = artifact_utils.get_single_uri([model])
+    output_dir = artifact_utils.get_single_uri([output])
 
     # load the model
     model = tf.keras.models.load_model(os.path.join(input_dir, 'serving_model_dir'))
 
-    # transform
-    new_model, signatures, options = fn(model, pipeline_configuration)
-
-    # save the model
-    tf.saved_model.save(model, os.path.join(output_dir, 'serving_model_dir'), signatures, options)
+    # export
+    fn(model, pipeline_configuration, output_dir)

@@ -21,3 +21,10 @@ class PipelineConfiguration(Artifact):
   PROPERTIES = {
     'version': VERSION_PROPERTY,
   }
+
+
+class ExportedModel(Artifact):
+  TYPE_NAME = 'ExportedModel'
+  PROPERTIES = {
+    'version': VERSION_PROPERTY,
+  }
