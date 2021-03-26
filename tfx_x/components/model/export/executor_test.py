@@ -15,7 +15,7 @@
 import json
 import os
 import tempfile
-from typing import Dict, Text, Any
+from typing import Dict, Text, Any, Optional
 
 import absl
 import tensorflow as tf
@@ -93,7 +93,8 @@ class ExecutorTest(tf.test.TestCase):
     self.assertTrue(fileio.exists(self._output_dir))
 
 
-def stuffs(model: tf.keras.Model, _pipeline_configuration: Dict[Text, Any], _output_dir: Text):
+def stuffs(model: tf.keras.Model, _pipeline_configuration: Dict[Text, Any], _output_dir: Text,
+           _model_pushed_dir: Optional[Text]):
   absl.logging.debug('Model signatures: %s', json.dumps(list(model.signatures.keys())))
 
 

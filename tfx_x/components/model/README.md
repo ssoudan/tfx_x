@@ -39,7 +39,7 @@ the function 'function_name' refers to, must be of type `(Kodel) -> (Model, Dict
 
 ```python
 
-def export_fn(model, pipeline_configuration, output_dir):
+def export_fn(model, pipeline_configuration, output_dir, model_pushed_dir):
   json.dumps({'something': 'else'}, os.path.join(output_dir, 'model.json'))
 
 

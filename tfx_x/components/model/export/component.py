@@ -21,7 +21,7 @@ from tfx.dsl.components.base import executor_spec
 from tfx.types import standard_artifacts
 from tfx.types.component_spec import ChannelParameter
 from tfx.types.component_spec import ExecutionParameter
-from tfx.types.standard_component_specs import MODEL_BLESSING_KEY, INFRA_BLESSING_KEY
+from tfx.types.standard_component_specs import MODEL_BLESSING_KEY, INFRA_BLESSING_KEY, PUSHED_MODEL_KEY
 
 from tfx_x import PipelineConfiguration
 from tfx_x.components.model.export import executor
@@ -41,6 +41,7 @@ class ExportSpec(types.ComponentSpec):
     PIPELINE_CONFIGURATION_KEY: ChannelParameter(type=PipelineConfiguration, optional=True),
     MODEL_BLESSING_KEY: ChannelParameter(type=standard_artifacts.ModelBlessing, optional=True),
     INFRA_BLESSING_KEY: ChannelParameter(type=standard_artifacts.InfraBlessing, optional=True),
+    PUSHED_MODEL_KEY: ChannelParameter(type=standard_artifacts.PushedModel, optional=True),
   }
   OUTPUTS = {
     OUTPUT_KEY: ChannelParameter(type=ExportedModel),
@@ -60,6 +61,7 @@ class Export(base_component.BaseComponent):
                model: types.Channel = None,
                model_blessing: Optional[types.Channel] = None,
                infra_blessing: Optional[types.Channel] = None,
+               pushed_model: Optional[types.Channel] = None,
                output: types.Channel = None,
                pipeline_configuration: Optional[types.Channel] = None,
                instance_name: Optional[Text] = None):
@@ -70,6 +72,7 @@ class Export(base_component.BaseComponent):
       model: A Channel of type `standard_artifacts.Model`.
       model_blessing: A Channel of type `standard_artifacts.ModelBlessing`.
       infra_blessing: A Channel of type `standard_artifacts.InfraBlessing`.
+      pushed_model: A Channel of type `standard_artifacts.PushedModel`.
       output: A Channel of type `ExportedModel`.
       pipeline_configuration: A Channel of 'PipelineConfiguration' type, usually produced by FromCustomConfig component.
       instance_name: The instance_name of the instance - Optional.
@@ -80,6 +83,7 @@ class Export(base_component.BaseComponent):
                       model=model,
                       model_blessing=model_blessing,
                       infra_blessing=infra_blessing,
+                      pushed_model=pushed_model,
                       output=output,
                       instance_name=instance_name)
     super(Export, self).__init__(spec=spec, instance_name=instance_name)

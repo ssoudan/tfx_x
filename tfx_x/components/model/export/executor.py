@@ -15,12 +15,12 @@
 import importlib
 import json
 import os
-from typing import Any, Dict, List, Text
+from typing import Any, Dict, List, Text, Optional
 
 import tensorflow as tf
 from tfx import types
 from tfx.components.pusher import executor as tfx_pusher_executor
-from tfx.types import artifact_utils
+from tfx.types import artifact_utils, standard_component_specs
 from tfx.utils import io_utils
 
 OUTPUT_KEY = 'output'
@@ -29,7 +29,8 @@ FUNCTION_NAME_KEY = 'function_name'
 PIPELINE_CONFIGURATION_KEY = 'pipeline_configuration'
 
 
-def noop(_model: tf.keras.Model, _pipeline_configuration: Dict[Text, Any], _output_dir: Text):
+def noop(_model: tf.keras.Model, _pipeline_configuration: Dict[Text, Any], _output_dir: Text,
+         _model_pushed_dir: Optional[Text]):
   pass
 
 
@@ -50,6 +51,7 @@ class Executor(tfx_pusher_executor.Executor):
         - pipeline_configuration: optional PipelineConfiguration artifact.
         - model_blessing: optional model blessing artifact.
         - infra_blessing: optional infra blessing artifact.
+        - pushed_model: optional pushed model artifact.
       output_dict: Output dict from key to a list of artifacts, including:
         - output: model export artifact.
       exec_properties: A dict of execution properties, including:
@@ -75,6 +77,11 @@ class Executor(tfx_pusher_executor.Executor):
     output = artifact_utils.get_single_instance(
       output_dict[OUTPUT_KEY])
 
+    model_push = None
+    if standard_component_specs.PUSHED_MODEL_KEY in output_dict:
+      model_push = artifact_utils.get_single_instance(
+        output_dict[standard_component_specs.PUSHED_MODEL_KEY])
+
     function_name = exec_properties.get(FUNCTION_NAME_KEY, 'tfx_x.components.model.export.executor.noop')
 
     pipeline_configuration = {}
@@ -97,8 +104,12 @@ class Executor(tfx_pusher_executor.Executor):
     input_dir = artifact_utils.get_single_uri([model])
     output_dir = artifact_utils.get_single_uri([output])
 
+    model_push_dir = None
+    if model_push is not None:
+      model_push_dir = artifact_utils.get_single_uri([model_push])
+
     # load the model
     model = tf.keras.models.load_model(os.path.join(input_dir, 'serving_model_dir'))
 
     # export
-    fn(model, pipeline_configuration, output_dir)
+    fn(model, pipeline_configuration, output_dir, model_push_dir)
