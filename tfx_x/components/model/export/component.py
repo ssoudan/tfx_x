@@ -18,7 +18,7 @@ from typing import Optional, Text
 from tfx import types
 from tfx.dsl.components.base import base_component
 from tfx.dsl.components.base import executor_spec
-from tfx.types import standard_artifacts
+from tfx.types import standard_artifacts, channel_utils
 from tfx.types.component_spec import ChannelParameter
 from tfx.types.component_spec import ExecutionParameter
 from tfx.types.standard_component_specs import MODEL_BLESSING_KEY, INFRA_BLESSING_KEY, PUSHED_MODEL_KEY
@@ -27,6 +27,7 @@ from tfx_x import PipelineConfiguration
 from tfx_x.components.model.export import executor
 from tfx_x.components.model.export.executor import OUTPUT_KEY, MODEL_KEY, FUNCTION_NAME_KEY, \
   PIPELINE_CONFIGURATION_KEY
+from tfx_x.types import artifacts
 from tfx_x.types.artifacts import ExportedModel
 
 
@@ -77,6 +78,9 @@ class Export(base_component.BaseComponent):
       pipeline_configuration: A Channel of 'PipelineConfiguration' type, usually produced by FromCustomConfig component.
       instance_name: The instance_name of the instance - Optional.
     """
+
+    if not output:
+      output = channel_utils.as_channel([artifacts.ExportedModel()])
 
     spec = ExportSpec(function_name=function_name,
                       pipeline_configuration=pipeline_configuration,
