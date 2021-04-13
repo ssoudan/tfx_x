@@ -30,7 +30,7 @@ PIPELINE_CONFIGURATION_KEY = 'pipeline_configuration'
 
 
 def noop(_model: tf.keras.Model, _pipeline_configuration: Dict[Text, Any], _output_dir: Text,
-         _model_pushed_dir: Optional[Text]):
+         _model_pushed_dir: Optional[Text], _model_pushed_artifact: Optional[types.Artifact]):
   pass
 
 
@@ -77,9 +77,9 @@ class Executor(tfx_pusher_executor.Executor):
     output = artifact_utils.get_single_instance(
       output_dict[OUTPUT_KEY])
 
-    model_push = None
+    model_push_artifact = None
     if standard_component_specs.PUSHED_MODEL_KEY in output_dict:
-      model_push = artifact_utils.get_single_instance(
+      model_push_artifact = artifact_utils.get_single_instance(
         output_dict[standard_component_specs.PUSHED_MODEL_KEY])
 
     function_name = exec_properties.get(FUNCTION_NAME_KEY, 'tfx_x.components.model.export.executor.noop')
@@ -105,11 +105,11 @@ class Executor(tfx_pusher_executor.Executor):
     output_dir = artifact_utils.get_single_uri([output])
 
     model_push_dir = None
-    if model_push is not None:
-      model_push_dir = artifact_utils.get_single_uri([model_push])
+    if model_push_artifact is not None:
+      model_push_dir = artifact_utils.get_single_uri([model_push_artifact])
 
     # load the model
     model = tf.keras.models.load_model(os.path.join(input_dir, 'serving_model_dir'))
 
     # export
-    fn(model, pipeline_configuration, output_dir, model_push_dir)
+    fn(model, pipeline_configuration, output_dir, model_push_dir, model_push_artifact)
