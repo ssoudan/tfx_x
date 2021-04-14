@@ -78,9 +78,9 @@ class Executor(tfx_pusher_executor.Executor):
       output_dict[OUTPUT_KEY])
 
     model_push_artifact = None
-    if standard_component_specs.PUSHED_MODEL_KEY in output_dict:
+    if standard_component_specs.PUSHED_MODEL_KEY in input_dict:
       model_push_artifact = artifact_utils.get_single_instance(
-        output_dict[standard_component_specs.PUSHED_MODEL_KEY])
+        input_dict[standard_component_specs.PUSHED_MODEL_KEY])
 
     function_name = exec_properties.get(FUNCTION_NAME_KEY, 'tfx_x.components.model.export.executor.noop')
 
