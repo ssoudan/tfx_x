@@ -88,7 +88,7 @@ def predicate(m):
     return results
 
   def _verify_filtered_example_split(self, split_name):
-    dir_path = os.path.join(self._filtered_examples_dir, split_name)
+    dir_path = os.path.join(self._filtered_examples_dir,  'Split-' + split_name)
     logging.info("Looking for examples split in %s", dir_path)
 
     self.assertTrue(
@@ -99,7 +99,7 @@ def predicate(m):
     self.assertTrue(results)
 
   def _verify_copied_example_split(self, split_name):
-    dir_path = os.path.join(self._filtered_examples_dir, split_name)
+    dir_path = os.path.join(self._filtered_examples_dir,  'Split-' + split_name)
     logging.info("Looking for examples split in %s", dir_path)
 
     self.assertTrue(

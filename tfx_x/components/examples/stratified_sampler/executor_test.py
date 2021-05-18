@@ -89,7 +89,7 @@ def to_key(m):
     return results
 
   def _verify_stratified_example_split(self, split_name):
-    dir_path = os.path.join(self._stratified_examples_dir, split_name)
+    dir_path = os.path.join(self._stratified_examples_dir, 'Split-' + split_name)
     logging.info("Looking for examples split in %s", dir_path)
 
     self.assertTrue(
@@ -100,7 +100,7 @@ def to_key(m):
     self.assertTrue(results)
 
   def _verify_copied_example_split(self, split_name):
-    dir_path = os.path.join(self._stratified_examples_dir, split_name)
+    dir_path = os.path.join(self._stratified_examples_dir,  'Split-' + split_name)
     logging.info("Looking for examples split in %s", dir_path)
 
     self.assertTrue(
