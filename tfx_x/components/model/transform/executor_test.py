@@ -49,7 +49,7 @@ class ExecutorTest(tf.test.TestCase):
     )
     model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
-    model.save(os.path.join(self._model_data_dir, 'serving_model_dir'))
+    model.save(os.path.join(self._model_data_dir, 'Format-Serving'))
     del model
 
     # Create input dict.

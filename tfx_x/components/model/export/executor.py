@@ -109,7 +109,7 @@ class Executor(tfx_pusher_executor.Executor):
       model_push_dir = artifact_utils.get_single_uri([model_push_artifact])
 
     # load the model
-    model = tf.keras.models.load_model(os.path.join(input_dir, 'serving_model_dir'))
+    model = tf.keras.models.load_model(os.path.join(input_dir, 'Format-Serving'))
 
     # export
     fn(model, pipeline_configuration, output_dir, model_push_dir, model_push_artifact)

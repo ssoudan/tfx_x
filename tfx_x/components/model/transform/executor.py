@@ -93,10 +93,10 @@ class Executor(base_executor.BaseExecutor):
     output_dir = artifact_utils.get_single_uri([output_model])
 
     # load the model
-    model = tf.keras.models.load_model(os.path.join(input_dir, 'serving_model_dir'))
+    model = tf.keras.models.load_model(os.path.join(input_dir, 'Format-Serving'))
 
     # transform
     new_model, signatures, options = fn(model, pipeline_configuration)
 
     # save the model
-    tf.saved_model.save(model, os.path.join(output_dir, 'serving_model_dir'), signatures, options)
+    tf.saved_model.save(model, os.path.join(output_dir, 'Format-Serving'), signatures, options)
