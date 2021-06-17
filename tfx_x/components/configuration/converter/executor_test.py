@@ -46,8 +46,7 @@ class ExecutorTest(tf.test.TestCase):
 
     this_component = component.FromCustomConfig(custom_config=custom_config,
                                                 pipeline_configuration=channel_utils.as_channel(
-                                                  [pipeline_configuration]),
-                                                instance_name=u'Testing123')
+                                                  [pipeline_configuration])).with_id(u'Testing123')
     self.assertEqual(artifacts.PipelineConfiguration.TYPE_NAME,
                      this_component.outputs[PIPELINE_CONFIGURATION_KEY].type_name)
     artifact_collection = this_component.outputs[PIPELINE_CONFIGURATION_KEY].get()

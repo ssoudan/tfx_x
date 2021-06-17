@@ -77,8 +77,7 @@ class StratifiedSampler(base_component.BaseComponent):
                stratified_examples: Optional[types.Channel] = None,
                splits_to_transform: Optional[List[Text]] = None,
                splits_to_copy: Optional[List[Text]] = None,
-               samples_per_key: Optional[int] = None,
-               instance_name: Optional[Text] = None):
+               samples_per_key: Optional[int] = None):
     """Construct an StratifiedSampler component.
     Args:
       examples: A Channel of 'Examples' type, usually produced by ExampleGen
@@ -94,10 +93,7 @@ class StratifiedSampler(base_component.BaseComponent):
       to_key_fn: To key function, the function that will extract the key - must be 'to_key: Example -> key
                  For example something like:
                  >>> def to_key(m):
-                       return m.features.feature['trip_miles'].float_list.value[0] > 42.
-      instance_name: Optional name assigned to this specific instance of
-        StratifiedSampler. Required only if multiple StratifiedSampler components are
-        declared in the same pipeline.
+                 >>>   return m.features.feature['trip_miles'].float_list.value[0] > 42.
     """
     stratified_examples = stratified_examples or types.Channel(
       type=standard_artifacts.Examples)
@@ -114,4 +110,4 @@ class StratifiedSampler(base_component.BaseComponent):
       to_key_fn=to_key_fn,
       to_key_fn_key=to_key_fn_key,
       samples_per_key=samples_per_key)
-    super(StratifiedSampler, self).__init__(spec=spec, instance_name=instance_name)
+    super(StratifiedSampler, self).__init__(spec=spec)

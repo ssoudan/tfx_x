@@ -58,14 +58,12 @@ class FromCustomConfig(base_component.BaseComponent):
 
   def __init__(self,
                custom_config: Optional[Dict[Text, Any]] = None,
-               pipeline_configuration: types.Channel = None,
-               instance_name: Optional[Text] = None):
+               pipeline_configuration: types.Channel = None):
     """Construct a pipeline configuration converter component.
 
     Args:
       pipeline_configuration: A Channel of type `artifacts.PipelineConfiguration`.
       custom_config: The configuration.
-      instance_name: the instance_name of the instance
     """
     if not pipeline_configuration:
       pipeline_configuration = channel_utils.as_channel([artifacts.PipelineConfiguration()])
@@ -75,5 +73,4 @@ class FromCustomConfig(base_component.BaseComponent):
 
     spec = FromCustomConfigSpec(custom_config=json_utils.dumps(custom_config),
                                 pipeline_configuration=pipeline_configuration)
-    super(FromCustomConfig, self).__init__(spec=spec,
-                                           instance_name=instance_name)
+    super(FromCustomConfig, self).__init__(spec=spec)

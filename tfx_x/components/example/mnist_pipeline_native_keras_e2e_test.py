@@ -96,14 +96,14 @@ def predicate(m):
   def assertPipelineExecution(self) -> None:
     self.assertExecutedOnce('ImportExampleGen')
     self.assertExecutedOnce('FromCustomConfig')
-    self.assertExecutedOnce('Evaluator.mnist')
+    self.assertExecutedOnce('evaluator')
     self.assertExecutedOnce('ExampleValidator')
-    self.assertExecutedOnce('Pusher.mnist')
+    self.assertExecutedOnce('pusher')
     self.assertExecutedOnce('SchemaGen')
     self.assertExecutedOnce('Filter')
     self.assertExecutedOnce('StratifiedSampler')
     self.assertExecutedOnce('StatisticsGen')
-    self.assertExecutedOnce('Trainer.mnist')
+    self.assertExecutedOnce('trainer')
     self.assertExecutedOnce('Transform')
 
   def testMNISTPipelineNativeKeras(self):

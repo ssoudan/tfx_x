@@ -64,8 +64,7 @@ class Export(base_component.BaseComponent):
                infra_blessing: Optional[types.Channel] = None,
                pushed_model: Optional[types.Channel] = None,
                output: types.Channel = None,
-               pipeline_configuration: Optional[types.Channel] = None,
-               instance_name: Optional[Text] = None):
+               pipeline_configuration: Optional[types.Channel] = None):
     """Construct a model export component.
 
     Args:
@@ -76,7 +75,6 @@ class Export(base_component.BaseComponent):
       pushed_model: A Channel of type `standard_artifacts.PushedModel`.
       output: A Channel of type `ExportedModel`.
       pipeline_configuration: A Channel of 'PipelineConfiguration' type, usually produced by FromCustomConfig component.
-      instance_name: The instance_name of the instance - Optional.
     """
 
     if not output:
@@ -88,6 +86,5 @@ class Export(base_component.BaseComponent):
                       model_blessing=model_blessing,
                       infra_blessing=infra_blessing,
                       pushed_model=pushed_model,
-                      output=output,
-                      instance_name=instance_name)
-    super(Export, self).__init__(spec=spec, instance_name=instance_name)
+                      output=output)
+    super(Export, self).__init__(spec=spec)

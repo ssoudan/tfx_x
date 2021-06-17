@@ -56,8 +56,7 @@ class Transform(base_component.BaseComponent):
                function_name: Text = None,
                input_model: types.Channel = None,
                output_model: types.Channel = None,
-               pipeline_configuration: Optional[types.Channel] = None,
-               instance_name: Optional[Text] = None):
+               pipeline_configuration: Optional[types.Channel] = None):
     """Construct a model transformation component.
 
     Args:
@@ -65,7 +64,6 @@ class Transform(base_component.BaseComponent):
       input_model: A Channel of type `standard_artifacts.Model`.
       pipeline_configuration: A Channel of 'PipelineConfiguration' type, usually produced by FromCustomConfig component.
       output_model: A Channel of type `standard_artifacts.Model`.
-      instance_name: The instance_name of the instance - Optional.
     """
 
     if not output_model:
@@ -74,6 +72,5 @@ class Transform(base_component.BaseComponent):
     spec = TransformSpec(function_name=function_name,
                          pipeline_configuration=pipeline_configuration,
                          input_model=input_model,
-                         output_model=output_model,
-                         instance_name=instance_name)
-    super(Transform, self).__init__(spec=spec, instance_name=instance_name)
+                         output_model=output_model)
+    super(Transform, self).__init__(spec=spec)

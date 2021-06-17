@@ -71,7 +71,6 @@ class ExecutorTest(tf.test.TestCase):
 
     # Create exe properties.
     self._exec_properties = {
-      'instance_name': 'something',
       FUNCTION_NAME_KEY: 'tfx_x.components.model.transform.executor.identity',
     }
 

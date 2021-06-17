@@ -146,8 +146,7 @@ def _create_pipeline(pipeline_name: Text, pipeline_root: Text, data_root: Text,
     transform_graph=transform.outputs['transform_graph'],
     schema=schema_gen.outputs['schema'],
     train_args=trainer_pb2.TrainArgs(num_steps=5000),
-    eval_args=trainer_pb2.EvalArgs(num_steps=100),
-    instance_name='mnist')
+    eval_args=trainer_pb2.EvalArgs(num_steps=100)).with_id(u'trainer')
 
   # Uses TFMA to compute evaluation statistics over features of a model and
   # performs quality validation of a candidate model.
@@ -168,8 +167,7 @@ def _create_pipeline(pipeline_name: Text, pipeline_root: Text, data_root: Text,
   evaluator = Evaluator(
     examples=stratified_examples.outputs['stratified_examples'],
     model=trainer.outputs['model'],
-    eval_config=eval_config,
-    instance_name='mnist')
+    eval_config=eval_config).with_id(u'evaluator')
 
   # Checks whether the model passed the validation steps and pushes the model
   # to a file destination if check passed.
@@ -178,8 +176,7 @@ def _create_pipeline(pipeline_name: Text, pipeline_root: Text, data_root: Text,
     model_blessing=evaluator.outputs['blessing'],
     push_destination=pusher_pb2.PushDestination(
       filesystem=pusher_pb2.PushDestination.Filesystem(
-        base_directory=serving_model_dir)),
-    instance_name='mnist')
+        base_directory=serving_model_dir))).with_id(u'pusher')
 
   return pipeline.Pipeline(
     pipeline_name=pipeline_name,

@@ -39,8 +39,7 @@ class TransformTest(tf.test.TestCase):
     this_component = component.Export(function_name='component_test.pouet',
                                       model=channel_utils.as_channel([model]),
                                       model_blessing=channel_utils.as_channel([model_blessing]),
-                                      output=channel_utils.as_channel([output]),
-                                      instance_name=u'Testing123')
+                                      output=channel_utils.as_channel([output])).with_id(u'Testing123')
     self.assertEqual(ExportedModel.TYPE_NAME,
                      this_component.outputs[OUTPUT_KEY].type_name)
     artifact_collection = this_component.outputs[OUTPUT_KEY].get()

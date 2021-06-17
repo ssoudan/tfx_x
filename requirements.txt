@@ -1,4 +1,4 @@
 six>=1.15.0
-tfx>=0.29.0, <0.30.0
-tensorflow>=2.4.1
+tfx>=0.30.0, <0.31.0
+tensorflow==2.4.2
 setuptools>=54.1.0

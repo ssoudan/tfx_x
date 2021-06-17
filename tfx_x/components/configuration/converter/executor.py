@@ -41,9 +41,6 @@ class Executor(base_executor.BaseExecutor):
         - pipeline_configuration: A list of type `artifacts.PipelineConfiguration`
       exec_properties: A dict of execution properties, including:
         - custom_config: the configuration to save.
-        - instance_name: Optional unique name. Necessary iff multiple FromCustomConfig components
-          are declared in the same pipeline.
-
     Returns:
       None
 
