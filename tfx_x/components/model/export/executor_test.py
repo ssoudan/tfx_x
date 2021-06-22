@@ -23,10 +23,9 @@ from tensorflow import keras
 from tfx.dsl.io import fileio
 from tfx.types import standard_artifacts, Artifact
 
-from tfx_x import types
 from tfx_x.components.model.export import executor
 from tfx_x.components.model.export.executor import FUNCTION_NAME_KEY, MODEL_KEY, OUTPUT_KEY
-from tfx_x.types.artifacts import ExportedModel
+from tfx_x import ExportedModel
 
 
 class ExecutorTest(tf.test.TestCase):

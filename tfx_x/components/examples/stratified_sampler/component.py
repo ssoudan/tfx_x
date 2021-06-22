@@ -31,7 +31,7 @@ from tfx_x.components.examples.stratified_sampler import executor
 from tfx_x.components.examples.stratified_sampler.executor import SPLITS_TO_TRANSFORM_KEY, \
   SAMPLES_PER_KEY_KEY, TO_KEY_FN_KEY, SPLITS_TO_COPY_KEY, STRATIFIED_EXAMPLES_KEY, EXAMPLES_KEY, \
   PIPELINE_CONFIGURATION_KEY, TO_KEY_FN_KEY_KEY
-from tfx_x.types.artifacts import PipelineConfiguration
+from tfx_x import PipelineConfiguration
 
 
 class StratifiedSamplerSpec(ComponentSpec):

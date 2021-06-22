@@ -31,7 +31,7 @@ from tfx_x.components.examples.filter import executor
 from tfx_x.components.examples.filter.executor import SPLITS_TO_TRANSFORM_KEY, \
   PREDICATE_FN_KEY, SPLITS_TO_COPY_KEY, FILTERED_EXAMPLES_KEY, EXAMPLES_KEY, \
   PIPELINE_CONFIGURATION_KEY, PREDICATE_FN_KEY_KEY
-from tfx_x.types.artifacts import PipelineConfiguration
+from tfx_x import PipelineConfiguration
 
 
 class FilterSpec(ComponentSpec):

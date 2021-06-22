@@ -19,7 +19,7 @@ from tfx.types import standard_artifacts
 
 from tfx_x.components.model.export import component
 from tfx_x.components.model.export.executor import OUTPUT_KEY
-from tfx_x.types.artifacts import ExportedModel
+from tfx_x import ExportedModel
 
 
 def pouet(model, _pipeline_configuration):

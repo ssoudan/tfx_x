@@ -24,7 +24,7 @@ from tfx.types import standard_artifacts
 
 from tfx_x.components.examples.stratified_sampler.component import StratifiedSampler
 from tfx_x.components.examples.stratified_sampler.executor import STRATIFIED_EXAMPLES_KEY
-from tfx_x.types.artifacts import PipelineConfiguration
+from tfx_x import PipelineConfiguration
 
 
 class ComponentTest(tf.test.TestCase):

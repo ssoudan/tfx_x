@@ -27,8 +27,7 @@ from tfx_x import PipelineConfiguration
 from tfx_x.components.model.export import executor
 from tfx_x.components.model.export.executor import OUTPUT_KEY, MODEL_KEY, FUNCTION_NAME_KEY, \
   PIPELINE_CONFIGURATION_KEY
-from tfx_x.types import artifacts
-from tfx_x.types.artifacts import ExportedModel
+from tfx_x import ExportedModel
 
 
 class ExportSpec(types.ComponentSpec):
@@ -78,7 +77,7 @@ class Export(base_component.BaseComponent):
     """
 
     if not output:
-      output = channel_utils.as_channel([artifacts.ExportedModel()])
+      output = channel_utils.as_channel([ExportedModel()])
 
     spec = ExportSpec(function_name=function_name,
                       pipeline_configuration=pipeline_configuration,
