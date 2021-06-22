@@ -13,18 +13,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 from tfx.types import Artifact
-from tfx.types.standard_artifacts import VERSION_PROPERTY
 
 
 class PipelineConfiguration(Artifact):
   TYPE_NAME = 'PipelineConfiguration'
-  PROPERTIES = {
-    'version': VERSION_PROPERTY,
-  }
 
 
 class ExportedModel(Artifact):
   TYPE_NAME = 'ExportedModel'
-  PROPERTIES = {
-    'version': VERSION_PROPERTY,
-  }
