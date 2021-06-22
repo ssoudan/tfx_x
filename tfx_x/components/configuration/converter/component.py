@@ -26,9 +26,10 @@ from tfx.types.component_spec import ChannelParameter
 from tfx.types.component_spec import ExecutionParameter
 from tfx.utils import json_utils
 
+from tfx_x import PipelineConfiguration
 from tfx_x.components.configuration.converter import executor
 from tfx_x.components.configuration.converter.executor import CUSTOM_CONFIG_KEY, PIPELINE_CONFIGURATION_KEY
-from tfx_x.types import artifacts
+
 
 
 class FromCustomConfigSpec(types.ComponentSpec):
@@ -43,7 +44,7 @@ class FromCustomConfigSpec(types.ComponentSpec):
   }
   OUTPUTS = {
     # This will be a dictionary which this component will populate
-    PIPELINE_CONFIGURATION_KEY: ChannelParameter(type=artifacts.PipelineConfiguration),
+    PIPELINE_CONFIGURATION_KEY: ChannelParameter(type=PipelineConfiguration),
   }
 
 
@@ -66,7 +67,7 @@ class FromCustomConfig(base_component.BaseComponent):
       custom_config: The configuration.
     """
     if not pipeline_configuration:
-      pipeline_configuration = channel_utils.as_channel([artifacts.PipelineConfiguration()])
+      pipeline_configuration = channel_utils.as_channel([PipelineConfiguration()])
 
     if not custom_config:
       custom_config = {}

@@ -18,7 +18,7 @@ import os
 import tensorflow as tf
 from tfx.types import channel_utils
 
-from tfx_x.types import artifacts
+from tfx_x import PipelineConfiguration
 from tfx_x.components.configuration.converter import component
 from tfx_x.components.configuration.converter.executor import PIPELINE_CONFIGURATION_KEY
 
@@ -39,13 +39,13 @@ class ExportTest(tf.test.TestCase):
 
     self._output_configuration_dir = os.path.join(self._output_data_dir,
                                                   'output_examples')
-    pipeline_configuration = artifacts.PipelineConfiguration()
+    pipeline_configuration = PipelineConfiguration()
     pipeline_configuration.uri = self._output_configuration_dir
 
     this_component = component.FromCustomConfig(custom_config=custom_config,
                                                 pipeline_configuration=channel_utils.as_channel(
                                                   [pipeline_configuration])).with_id(u'Testing123')
-    self.assertEqual(artifacts.PipelineConfiguration.TYPE_NAME,
+    self.assertEqual(PipelineConfiguration.TYPE_NAME,
                      this_component.outputs[PIPELINE_CONFIGURATION_KEY].type_name)
     artifact_collection = this_component.outputs[PIPELINE_CONFIGURATION_KEY].get()
     self.assertIsNotNone(artifact_collection)
