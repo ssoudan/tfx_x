@@ -13,8 +13,15 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from tfx.types import Artifact
 
-from tfx_x.types.artifacts import PipelineConfiguration
-from tfx_x.types.artifacts import ExportedModel
 # Import version string.
 from tfx_x.version import __version__
+
+
+class PipelineConfiguration(Artifact):
+  TYPE_NAME = 'PipelineConfiguration'
+
+
+class ExportedModel(Artifact):
+  TYPE_NAME = 'ExportedModel'
