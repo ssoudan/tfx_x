@@ -27,7 +27,7 @@ import apache_beam as beam
 import tensorflow as tf
 from absl import logging
 from tfx import types
-from tfx.dsl.components.base import base_executor
+from tfx.dsl.components.base import base_beam_executor
 from tfx.types import artifact_utils, Artifact
 from tfx.utils import io_utils, json_utils
 
@@ -46,7 +46,7 @@ _STRATIFIED_EXAMPLES_FILE_PREFIX = 'stratified_examples'
 _STRATIFIED_EXAMPLES_DIR_NAME = 'stratified_examples'
 
 
-class Executor(base_executor.BaseExecutor):
+class Executor(base_beam_executor.BaseBeamExecutor):
   """TFX stratified sampler executor."""
 
   def Do(self, input_dict: Dict[Text, List[types.Artifact]],

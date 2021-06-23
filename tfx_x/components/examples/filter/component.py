@@ -65,7 +65,7 @@ class Filter(base_component.BaseComponent):
   """
 
   SPEC_CLASS = FilterSpec
-  EXECUTOR_SPEC = executor_spec.ExecutorClassSpec(executor.Executor)
+  EXECUTOR_SPEC = executor_spec.BeamExecutorSpec(executor.Executor)
 
   def __init__(self,
                examples: types.Channel,
