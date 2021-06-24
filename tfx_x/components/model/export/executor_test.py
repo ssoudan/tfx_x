@@ -23,9 +23,9 @@ from tensorflow import keras
 from tfx.dsl.io import fileio
 from tfx.types import standard_artifacts, Artifact
 
+from tfx_x import ExportedModel
 from tfx_x.components.model.export import executor
 from tfx_x.components.model.export.executor import FUNCTION_NAME_KEY, MODEL_KEY, OUTPUT_KEY
-from tfx_x import ExportedModel
 
 
 class ExecutorTest(tf.test.TestCase):
@@ -93,7 +93,8 @@ class ExecutorTest(tf.test.TestCase):
 
 
 def stuffs(model: tf.keras.Model, _pipeline_configuration: Dict[Text, Any], _output_dir: Text,
-           _model_pushed_dir: Optional[Text], _model_push_artifact: Optional[Artifact]):
+           _model_pushed_dir: Optional[Text], _model_push_artifact: Optional[Artifact],
+           _transform_graph_artifact: Optional[Artifact]):
   absl.logging.debug('Model signatures: %s', json.dumps(list(model.signatures.keys())))
 
 

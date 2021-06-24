@@ -36,8 +36,7 @@ class TransformTest(tf.test.TestCase):
     model = standard_artifacts.Model()
     model_blessing = standard_artifacts.ModelBlessing()
     output = ExportedModel()
-    this_component = component.Export(function_name='component_test.pouet',
-                                      model=channel_utils.as_channel([model]),
+    this_component = component.Export(function_name='component_test.pouet', model=channel_utils.as_channel([model]),
                                       model_blessing=channel_utils.as_channel([model_blessing]),
                                       output=channel_utils.as_channel([output])).with_id(u'Testing123')
     self.assertEqual(ExportedModel.TYPE_NAME,
