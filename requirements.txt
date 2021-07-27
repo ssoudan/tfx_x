@@ -1,4 +1,4 @@
 six>=1.15.0
-git+https://github.com/tensorflow/tfx@r1.0.0
+tfx==1.0.0
 tensorflow==2.5.0
 setuptools>=54.1.0
