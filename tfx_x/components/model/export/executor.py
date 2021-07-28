@@ -30,7 +30,9 @@ PIPELINE_CONFIGURATION_KEY = 'pipeline_configuration'
 
 
 def noop(_model: tf.keras.Model, _pipeline_configuration: Dict[Text, Any], _output_dir: Text,
-         _model_pushed_dir: Optional[Text], _model_pushed_artifact: Optional[types.Artifact]):
+         _model_pushed_dir: Optional[Text],
+         _model_pushed_artifact: Optional[types.Artifact],
+         _transform_graph_artifact: Optional[types.Artifact]):
   pass
 
 
@@ -52,6 +54,7 @@ class Executor(tfx_pusher_executor.Executor):
         - model_blessing: optional model blessing artifact.
         - infra_blessing: optional infra blessing artifact.
         - pushed_model: optional pushed model artifact.
+        - transform_graph: optional transform graph artifact.
       output_dict: Output dict from key to a list of artifacts, including:
         - output: model export artifact.
       exec_properties: A dict of execution properties, including:
@@ -81,6 +84,11 @@ class Executor(tfx_pusher_executor.Executor):
     if standard_component_specs.PUSHED_MODEL_KEY in input_dict:
       model_push_artifact = artifact_utils.get_single_instance(
         input_dict[standard_component_specs.PUSHED_MODEL_KEY])
+
+    transform_graph_artifact = None
+    if standard_component_specs.TRANSFORM_GRAPH_KEY in input_dict:
+      transform_graph_artifact = artifact_utils.get_single_instance(
+        input_dict[standard_component_specs.TRANSFORM_GRAPH_KEY])
 
     function_name = exec_properties.get(FUNCTION_NAME_KEY, 'tfx_x.components.model.export.executor.noop')
 
@@ -112,4 +120,4 @@ class Executor(tfx_pusher_executor.Executor):
     model = tf.keras.models.load_model(os.path.join(input_dir, 'Format-Serving'))
 
     # export
-    fn(model, pipeline_configuration, output_dir, model_push_dir, model_push_artifact)
+    fn(model, pipeline_configuration, output_dir, model_push_dir, model_push_artifact, transform_graph_artifact)

@@ -21,7 +21,8 @@ from tfx.dsl.components.base import executor_spec
 from tfx.types import standard_artifacts, channel_utils
 from tfx.types.component_spec import ChannelParameter
 from tfx.types.component_spec import ExecutionParameter
-from tfx.types.standard_component_specs import MODEL_BLESSING_KEY, INFRA_BLESSING_KEY, PUSHED_MODEL_KEY
+from tfx.types.standard_component_specs import MODEL_BLESSING_KEY, INFRA_BLESSING_KEY, PUSHED_MODEL_KEY, \
+  TRANSFORM_GRAPH_KEY
 
 from tfx_x import PipelineConfiguration
 from tfx_x.components.model.export import executor
@@ -42,6 +43,7 @@ class ExportSpec(types.ComponentSpec):
     MODEL_BLESSING_KEY: ChannelParameter(type=standard_artifacts.ModelBlessing, optional=True),
     INFRA_BLESSING_KEY: ChannelParameter(type=standard_artifacts.InfraBlessing, optional=True),
     PUSHED_MODEL_KEY: ChannelParameter(type=standard_artifacts.PushedModel, optional=True),
+    TRANSFORM_GRAPH_KEY: ChannelParameter(type=standard_artifacts.TransformGraph, optional=True),
   }
   OUTPUTS = {
     OUTPUT_KEY: ChannelParameter(type=ExportedModel),
@@ -63,7 +65,8 @@ class Export(base_component.BaseComponent):
                infra_blessing: Optional[types.Channel] = None,
                pushed_model: Optional[types.Channel] = None,
                output: types.Channel = None,
-               pipeline_configuration: Optional[types.Channel] = None):
+               pipeline_configuration: Optional[types.Channel] = None,
+               transform_graph: Optional[types.Channel] = None):
     """Construct a model export component.
 
     Args:
@@ -74,6 +77,7 @@ class Export(base_component.BaseComponent):
       pushed_model: A Channel of type `standard_artifacts.PushedModel`.
       output: A Channel of type `ExportedModel`.
       pipeline_configuration: A Channel of 'PipelineConfiguration' type, usually produced by FromCustomConfig component.
+      transform_graph: A channel of type `standard_artifacts.TransformGraph`.
     """
 
     if not output:
@@ -85,5 +89,6 @@ class Export(base_component.BaseComponent):
                       model_blessing=model_blessing,
                       infra_blessing=infra_blessing,
                       pushed_model=pushed_model,
-                      output=output)
+                      output=output,
+                      transform_graph=transform_graph)
     super(Export, self).__init__(spec=spec)
